@@ -4,32 +4,54 @@ We use regular characters to represent scalar variables, bold lowercase characte
 
 ## Logistic mixed model for a binary trait
 
-In a case-control study with a sample size $N$, let a $N \times 1$ Bernoulli random vector $\mathbf{y}$ represent their phenotypes; let an $N \times (1 + p)$ matrix $\mathbf{X}$ represent their $p$ covariates and a column of ones; let an $N \times 1$ vector $\mathbf{g}$ represent their genotypes coded as allele counts for a variant to be tested; let an $N \times m$ matrix $\mathbf{Z}$ represent their normalized genotypes of $m$ genetic markers with random effects. Let a linear predictor
+In a case-control study with a sample size $N$,
 
+let $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes, where $y_i \sim \operatorname{Bernoulli}(\mu_i)$;
+
+let an $N \times (1 + p)$ matrix $\mathbf{X}$ represent their $p$ covariates and a column of ones;
+
+let an $N \times 1$ vector $\mathbf{g}$ represent their genotypes coded as allele counts for a variant to be tested;
+
+let an $N \times 1$ vector $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$ represent random effects, where $\mathbf{\Psi}$ is a GRM and $\tau$ is the additive genetic variance;
+
+let $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$ be a linear predictor, where $\boldsymbol{\alpha}$ is the fixed effects and $\beta$ is the genetic effect to be tested.
+
+Suppose
 $$
-\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{Z}\boldsymbol{\gamma}
-
+\operatorname{logit}^{-1}(\eta_i) = \mu_i = \mathbb{P}(y_i = 1 | b_i; \mathbf{x}_i, g_i, \boldsymbol{\alpha}, \beta)
 $$
 
-where $\boldsymbol{\alpha}$ is the $(1 + p) \times 1$ vector of the fixed effects; $\beta$ is the genetic effect of the variant to be tested; $\boldsymbol{\gamma} \sim \mathcal{N}(\mathbf{0}, [{\tau}/m] \mathbf{I})$ is the $m \times 1$ vector of the random effects of the $m$ genetic markers. Let $\mathbf{b} = \mathbf{Z}\boldsymbol{\gamma}$ represent the total random effects and let $\mathbf{\Psi} = \mathbf{Z}\mathbf{Z}^\top/m$ represent the GRM. We have $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$. Suppose
-
+The PMF for $y_i$ is
 $$
-\mathbb{E}(\mathbf{y}|\mathbf{X},\mathbf{g},\mathbf{Z}) = \boldsymbol{\mu} = \text{logit}^{-1}(\boldsymbol{\eta})
-
+p(y_i | b_i; \mathbf{x}_i, g_i, \boldsymbol{\alpha}, \beta) = \mu_i^{y_i} (1 - \mu_i)^{1 - y_i}
 $$
 
-Let $\ell(\boldsymbol{\alpha}, \beta, \tau;\ \mathbf{y}, \mathbf{X}, \mathbf{g}, \mathbf{Z})$ represent the log-likelihood function. The score for $\beta$ is:
+The joint PMF for $\mathbf{y}$ conditional on $\mathbf{b}$ is
+$$
+p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) = \prod_{i=1}^N \mu_i^{y_i} (1 - \mu_i)^{1 - y_i}
+$$
+
+The marginal PMF for $\mathbf{y}$ is:
+$$
+p(\mathbf{y}; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \boldsymbol{\alpha}, \beta, \tau) = \int p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\tau, \mathbf{\Psi}) \, d\mathbf{b}
+$$
+where $f_{\mathbf{b}}(\tau, \mathbf{\Psi})$ is the PDF of $\mathbf{b}$.
+
+The marginal log-likelihood is:
+$$
+\ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log \int p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\tau, \mathbf{\Psi}) \, d\mathbf{b}
+$$
+
+The score for $\beta$ is:
 
 $$
 U_\beta = \left. \frac{\partial \ell}{\partial \beta} \right|_{\beta=0} = \left. \mathbf{g}^\top (\mathbf{y} - \boldsymbol{\mu}) \right|_{\beta=0}
-
 $$
 
 and the Fisher information for $\beta$ is
 
 $$
 I_\beta = -\left. \mathbb{E}\left[ \frac{\partial^2 \ell}{\partial \beta^2} \right] \right|_{\beta=0} = \left. \mathbf{g}^\top \mathbf{W} \mathbf{g} \right|_{\beta=0}
-
 $$
 
 where $\mathbf{W} = \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}])$ and $\odot$ denotes element-wise multiplication.
