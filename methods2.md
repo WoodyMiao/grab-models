@@ -4,43 +4,46 @@ We use regular characters to represent scalar variables, bold lowercase characte
 
 ## Logistic mixed model for a binary trait
 
-In a case-control study with a sample size $N$,
+In a case-control study with a sample size $N$, let
 
-let $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes, where $y_i \sim \operatorname{Bernoulli}(\mu_i)$;
+- $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes, where $y_i \sim \operatorname{Bernoulli}(\mu_i)$;
 
-let an $N \times (1 + p)$ matrix $\mathbf{X}$ represent their $p$ covariates and a column of ones;
+- $N \times (1 + p)$ matrix $\mathbf{X}$ represent their $p$ covariates and a column of ones;
 
-let an $N \times 1$ vector $\mathbf{g}$ represent their genotypes coded as allele counts for a variant to be tested;
+- $N \times 1$ vector $\mathbf{g}$ represent their genotypes coded as allele counts for a variant to be tested;
 
-let an $N \times 1$ vector $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$ represent random effects, where $\mathbf{\Psi}$ is a GRM and $\tau$ is the additive genetic variance;
+- $N \times 1$ vector $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$ represent random effects, where $\mathbf{\Psi}$ is a GRM and $\tau$ is the additive genetic variance;
 
-let $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$ be a linear predictor, where $\boldsymbol{\alpha}$ is the fixed effects and $\beta$ is the genetic effect to be tested.
+- $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$ be a linear predictor, where $\boldsymbol{\alpha}$ is the fixed effects and $\beta$ is the genetic effect to be tested.
 
-Suppose
+For subject $i$, suppose
 $$
 \operatorname{logit}^{-1}(\eta_i) = \mu_i = \mathbb{P}(y_i = 1 | b_i; \mathbf{x}_i, g_i, \boldsymbol{\alpha}, \beta)
 $$
 
-The PMF for $y_i$ is
+The conditional PMF of $y_i$ given $b_i$ is
 $$
 p(y_i | b_i; \mathbf{x}_i, g_i, \boldsymbol{\alpha}, \beta) = \mu_i^{y_i} (1 - \mu_i)^{1 - y_i}
 $$
 
-The joint PMF for $\mathbf{y}$ conditional on $\mathbf{b}$ is
+The conditional PMF of $\mathbf{y}$ given $\mathbf{b}$ is
 $$
-p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) = \prod_{i=1}^N \mu_i^{y_i} (1 - \mu_i)^{1 - y_i}
+p_{\mathbf{y} | \mathbf{b}}(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) = \prod_{i=1}^N \mu_i^{y_i} (1 - \mu_i)^{1 - y_i}
 $$
 
-The marginal PMF for $\mathbf{y}$ is:
+The marginal PMF of $\mathbf{y}$, which also serves as the likelihood function for $\boldsymbol{\alpha}, \beta, \tau$ is:
 $$
-p(\mathbf{y}; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \boldsymbol{\alpha}, \beta, \tau) = \int p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\tau, \mathbf{\Psi}) \, d\mathbf{b}
+p_{\mathbf{y}}(\mathbf{y}; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \boldsymbol{\alpha}, \beta, \tau) = \int p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\tau, \mathbf{\Psi}) \, d\mathbf{b}
 $$
 where $f_{\mathbf{b}}(\tau, \mathbf{\Psi})$ is the PDF of $\mathbf{b}$.
 
-The marginal log-likelihood is:
+The log-likelihood for $\boldsymbol{\alpha}, \beta, \tau$ is:
 $$
 \ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log \int p(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\tau, \mathbf{\Psi}) \, d\mathbf{b}
 $$
+
+
+
 
 The score for $\beta$ is:
 
