@@ -1,3 +1,5 @@
+# SAIGE
+
 In a case-control study with a sample size $N$, let
 
 - $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes, where $y_i \sim \operatorname{Bernoulli}(\mu_i)$;
@@ -11,26 +13,18 @@ Suppose $\operatorname{logit}(\mu_i) = \eta_i$.
 **1. The log-likelihood function for $\boldsymbol{\alpha}, \beta, \tau$ is**
 
 $$
-\ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log \int_{\mathbb{R}^N} p_{\mathbf{y} | \mathbf{b}}(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) f_{\mathbf{b}}(\mathbf{b}; \tau,\mathbf{\Psi}) \, \mathrm{d}\mathbf{b}
+\ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log \int_{\mathbb{R}^N} p_{\mathbf{y} | \mathbf{b}}(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta) \phi(\mathbf{b}; \mathbf{0}, \tau \mathbf{\Psi}) \, \mathrm{d}\mathbf{b}
 $$
 
-where $p_{\mathbf{y} | \mathbf{b}}(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta)$ is the conditional PMF of $\mathbf{y}$ given $\mathbf{b}$, and $f_{\mathbf{b}}(\mathbf{b}; \tau,\mathbf{\Psi})$ is the PDF of $\mathbf{b}$.
+where $p_{\mathbf{y} | \mathbf{b}}(\mathbf{y} | \mathbf{b}; \mathbf{X}, \mathbf{g}, \boldsymbol{\alpha}, \beta)$ is the conditional PMF of $\mathbf{y}$ given $\mathbf{b}$, and $\phi(\mathbf{b}; \mathbf{0}, \tau \mathbf{\Psi})$ is the PDF of $\mathbf{b}$.
 
-Under the null hypothesis $\beta = 0$, $(\tau, \boldsymbol{\alpha}, \mathbf{b})$ are estimated by $(\hat{\tau}, \hat{\boldsymbol{\alpha}}, \hat{\mathbf{b}})$.
-
-**2. The log-likelihood function for $\beta$ is**
+**2. The log-likelihood function for $\beta$ under the null model is**
 
 $$
-\ell(\beta; \mathbf{y}, \mathbf{g}, \hat{\boldsymbol{\eta}}) = \mathbf{y}^\top \log(\boldsymbol{\mu}) + (\mathbf{1} - \mathbf{y})^\top \log(\mathbf{1} - \boldsymbol{\mu})
+\ell(\beta; \mathbf{y}, \mathbf{g}, \hat{\boldsymbol{\eta}}) = \log p_{\mathbf{y} | \mathbf{b}=\hat{\mathbf{b}}}(\mathbf{y};\mathbf{g}, \beta, \hat{\boldsymbol{\eta}}) = \mathbf{y}^\top (\mathbf{g}\beta + \hat{\boldsymbol{\eta}}) - \mathbf{1}^\top \log[1 + \exp(\mathbf{g}\beta + \hat{\boldsymbol{\eta}})]
 $$
 
-where  $\hat{\boldsymbol{\eta}} = \mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}$ and $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{g}\beta + \hat{\boldsymbol{\eta}})$.
-
-Substituting $\boldsymbol{\mu} = [1 + \exp(-\mathbf{g}\beta - \hat{\boldsymbol{\eta}})]^{-1}$ and simplifying, we obtain
-
-$$
-\ell(\beta; \mathbf{y}, \mathbf{g}, \hat{\boldsymbol{\eta}}) = \mathbf{y}^\top (\mathbf{g}\beta + \hat{\boldsymbol{\eta}}) - \mathbf{1}^\top \log[1 + \exp(\mathbf{g}\beta + \hat{\boldsymbol{\eta}})]
-$$
+where $(\hat{\tau}, \hat{\boldsymbol{\alpha}}, \hat{\mathbf{b}})$ is an estimate of $(\tau, \boldsymbol{\alpha}, \mathbf{b})$ under the null model, and $\hat{\boldsymbol{\eta}} = \mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}$.
 
 **3. The score function for $\beta$ is**
 
@@ -38,7 +32,7 @@ $$
 U_\beta(\beta) = \frac{\partial \ell(\beta; \mathbf{y}, \mathbf{g}, \hat{\boldsymbol{\eta}})}{\partial \beta} = \mathbf{g}^\top (\mathbf{y} - \boldsymbol{\mu})
 $$
 
-The score statistic is:
+where $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{g}\beta + \hat{\boldsymbol{\eta}})$. The score statistic is:
 $$
 T = U_\beta(0) = \mathbf{g}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})
 $$

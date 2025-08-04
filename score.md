@@ -1,4 +1,4 @@
-# Appendix
+# Score
 
 ## Model Specification
 

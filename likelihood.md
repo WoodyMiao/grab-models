@@ -1,4 +1,4 @@
-# Appendix
+# Likelihood
 
 ## Log-likelihood function derivation for a fixed-effects logistic model
 
@@ -73,7 +73,7 @@ $$
 ### Marginal PDF of $\mathbf{b}$
 
 $$
-f_{\mathbf{b}}(\mathbf{b}; \tau,\mathbf{\Psi}) = \frac{1}{(2\pi)^{\frac{N}{2}} |\tau \mathbf{\Psi}|^{\frac{1}{2}}} \exp\left(-\frac{1}{2} \mathbf{b}^\top (\tau \mathbf{\Psi})^{-1} \mathbf{b}\right)
+f_{\mathbf{b}}(\mathbf{b}; \tau,\mathbf{\Psi}) = \phi(\mathbf{b}; \mathbf{0}, \tau \mathbf{\Psi}) = \frac{1}{(2\pi)^{\frac{N}{2}} |\tau \mathbf{\Psi}|^{\frac{1}{2}}} \exp\left(-\frac{1}{2} \mathbf{b}^\top (\tau \mathbf{\Psi})^{-1} \mathbf{b}\right)
 $$
 
 ### Joint PMF/PDF of $(\mathbf{y},\mathbf{b})$
