@@ -27,3 +27,16 @@ Therefore,
 $$
 T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})
 $$
+
+**2. Proof $\tilde{\mathbf{g}}^\top \mathbf{X}=0$**
+
+$$
+\begin{aligned}
+  \tilde{\mathbf{g}}^\top \mathbf{X}
+  &= [\mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g}]^{\top} \mathbf{X} \\
+  &= \mathbf{g}^{\top}[\mathbf{I} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}]^{\top}\mathbf{X} \\
+  &= \mathbf{g}^{\top}[\mathbf{X} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X}] \\
+  &= \mathbf{g}^{\top}[\mathbf{X} - \mathbf{X}] \\
+  &= \mathbf{0}
+\end{aligned}
+$$

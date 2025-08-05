@@ -2,13 +2,15 @@
 
 In a case-control study with a sample size $N$, let
 
-- $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes, where $y_i \sim \operatorname{Bernoulli}(\mu_i)$;
+- $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ represent their phenotypes
 - $N \times (1 + p)$ matrix $\mathbf{X}$ represent their $p$ covariates and a column of ones;
 - $N \times 1$ vector $\mathbf{g}$ represent their genotypes coded as allele counts for a variant to be tested;
-- $N \times 1$ vector $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$, where $\mathbf{\Psi}$ is a GRM and $\tau$ is the additive genetic variance;
+- $N \times 1$ vector $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$, where $\mathbf{\Psi}$ is a GRM and $\tau$ is the variance component;
 - $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$, where $\boldsymbol{\alpha}$ is the fixed effects and $\beta$ is the genetic effect to be tested.
 
-Suppose $\operatorname{logit}(\mu_i) = \eta_i$. 
+Suppose $(\mathbf{X}, \mathbf{g}, \mathbf{\Psi})$ are observed and treated as fixed; $(\boldsymbol{\alpha}, \beta, \tau)$ are unknown fixed parameters; $\mathbf{y}$ and $\mathbf{b}$ are random vectors before observing the data.
+
+For the $i$th subject, suppose $y_i|b_i \sim \operatorname{Bernoulli}(\mu_i),\ \mu_i = \operatorname{logit}^{-1}(\eta_i)$
 
 **1. The log-likelihood function for $\boldsymbol{\alpha}, \beta, \tau$ is**
 
@@ -49,16 +51,15 @@ where $\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{
 
 **5. The variance of $T$ can be estimated as**
 $$
-\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}
+\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}
 $$
 
 where $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$ and $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$.
 
-
 **6. The standardized score statistic is**
 
 $$
-\frac{T}{\sqrt{\mathbb{V}(T)}} = \frac{\tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})}{\sqrt{\tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}}}
+\frac{T}{\sqrt{\hat{\mathbb{V}}(T)}} = \frac{\tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})}{\sqrt{\tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}}}
 $$
 
 which, as $N \to \infty$, converges in distribution to $\mathcal{N}(0, 1)$.

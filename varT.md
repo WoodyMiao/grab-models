@@ -1,110 +1,210 @@
-# Is $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ an unbiased estimator of $\operatorname{Var}(T)$?
+# Derivation of Variance of T and Consistency Proof in SAIGE
 
-## 1. Definition
+## Model Setup from SAIGE
 
-Let $T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})$, where $\tilde{\mathbf{g}}$ is the covariate-adjusted genotype vector and $\hat{\mathbf{P}}$ is a projection/variance matrix depending on the model fit.
+Consider the logistic mixed model from SAIGE with:
 
-The variance estimator is
+- $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ where $y_i \sim \operatorname{Bernoulli}(\mu_i)$
+- $\mathbf{X}$ is $N \times (1 + p)$ matrix of covariates and intercept
+- $\mathbf{g}$ is $N \times 1$ vector of genotypes (allele counts)
+- $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$ where $\mathbf{\Psi}$ is the GRM
+- $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$
+- $\mu_i = \operatorname{logit}^{-1}(\eta_i)$
+
+The score statistic is:
 $$
-\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}
-$$
-
-## 2. Is $\mathbb{V}(T)$ unbiased for $\operatorname{Var}(T)$?
-
-### a. Theoretical variance of $T$
-
-
-#### Step-by-step derivation of $\operatorname{Cov}(\mathbf{y})$ in the mixed model
-
-Consider the logistic mixed model:
-$$
-\mathbf{y} \mid \mathbf{b} \sim \operatorname{Bernoulli}(\boldsymbol{\mu}), \quad \boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b})
-$$
-where $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$.
-
-The marginal mean is
-$$
-\mathbb{E}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\mathbb{E}(\mathbf{y} \mid \mathbf{b})] = \mathbb{E}_{\mathbf{b}}[\boldsymbol{\mu}]
+T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})
 $$
 
-The marginal covariance is given by the law of total covariance:
+where $\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g}$ is the residual from regressing $\mathbf{g}$ on $\mathbf{X}$ using weight matrix $\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}])$, and $\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\hat{\boldsymbol{\eta}})$ with $\hat{\boldsymbol{\eta}} = \mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}$ being a linear predictor under the null model.
+
+## 1. Derivation of $\mathbb{V}(T)$
+
+### Step 1: Variance of $T$
+
 $$
-\operatorname{Cov}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\operatorname{Cov}(\mathbf{y} \mid \mathbf{b})] + \operatorname{Cov}_{\mathbf{b}}[\mathbb{E}(\mathbf{y} \mid \mathbf{b})]
+\mathbb{V}(T) = \mathbb{V}[\tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})] = \tilde{\mathbf{g}}^\top \mathbb{V}[(\mathbf{y} - \hat{\boldsymbol{\mu}})]\tilde{\mathbf{g}} = \tilde{\mathbf{g}}^\top \mathbb{V}(\mathbf{y})\tilde{\mathbf{g}}
 $$
-where
-- $\operatorname{Cov}(\mathbf{y} \mid \mathbf{b}) = \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))$
+
+### Step 2: Variance of $\mathbf{y}$
+
+By the law of total covariance:
+$$
+\mathbb{V}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\mathbb{V}(\mathbf{y} \mid \mathbf{b})] + \mathbb{V}_{\mathbf{b}}[\mathbb{E}(\mathbf{y} \mid \mathbf{b})]
+$$
+
+where:
+
+- $\mathbb{V}(\mathbf{y} \mid \mathbf{b}) = \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))$
 - $\mathbb{E}(\mathbf{y} \mid \mathbf{b}) = \boldsymbol{\mu}$
 
-So,
+So:
 $$
-\operatorname{Cov}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))] + \operatorname{Cov}_{\mathbf{b}}[\boldsymbol{\mu}]
-$$
-
-In practice, $\hat{\boldsymbol{\Sigma}}$ is a plug-in estimator for this marginal covariance, using fitted values and estimated variance components.
-
-
-For $T = \tilde{\mathbf{g}}^\top \mathbf{y}$,
-$$
-\operatorname{Var}(T) = \tilde{\mathbf{g}}^\top \operatorname{Cov}(\mathbf{y}) \tilde{\mathbf{g}}
+\mathbb{V}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))] + \mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}]
 $$
 
-However, when $\tilde{\mathbf{g}}$ is computed as a residual from a regression, and $\hat{\mathbf{P}}$ is the projection matrix orthogonal to $\mathbf{X}$, the estimator $\mathbb{V}(T)$ is designed to account for the loss of degrees of freedom and the structure of the model.
+### Step 3: Approximation for $\mathbb{V}(\mathbf{y})$
 
-### b. Unbiasedness in the linear model
+**First term approximation:**
+The first term involves the expectation of diagonal matrices over the random effects distribution. In practice, this is approximated by evaluating at the fitted values:
+$$
+\mathbb{E}_{\mathbf{b}}[\operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))] \approx \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot (\mathbf{1} - \hat{\boldsymbol{\mu}})) = \hat{\mathbf{W}}
+$$
 
+**Second term approximation:**
+For the second term $\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}]$, we use the delta method. Since $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X} \boldsymbol{\alpha} + \mathbf{b})$ and $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$, we have:
 
-#### Step-by-step derivation of unbiasedness in the linear model
+$$
+\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \mathbf{J} \mathbb{V}(\mathbf{b}) \mathbf{J}^\top = \mathbf{J} (\tau \mathbf{\Psi}) \mathbf{J}^\top
+$$
 
-Suppose $\mathbf{y} \sim \mathcal{N}(\mathbf{X}\boldsymbol{\alpha}, \sigma^2 \mathbf{I})$ and $\tilde{\mathbf{g}}$ is orthogonal to $\mathbf{X}$.
+where $\mathbf{J}$ is the Jacobian matrix with entries:
+$$
+J_{ij} = \frac{\partial \mu_i}{\partial b_j} = \frac{\partial}{\partial b_j} \operatorname{logit}^{-1}(\eta_i) = \mu_i (1 - \mu_i) \delta_{ij}
+$$
 
-1. $T = \tilde{\mathbf{g}}^\top \mathbf{y}$ is a linear combination of $\mathbf{y}$.
-2. $\operatorname{Var}(T) = \operatorname{Var}(\tilde{\mathbf{g}}^\top \mathbf{y}) = \tilde{\mathbf{g}}^\top \operatorname{Cov}(\mathbf{y}) \tilde{\mathbf{g}} = \sigma^2 \|\tilde{\mathbf{g}}\|^2$.
-3. The unbiased estimator of $\sigma^2$ is
-   $$
-   \hat{\sigma}^2 = \frac{\|\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\alpha}}\|^2}{N - p - 1}
-   $$
-   where $\hat{\boldsymbol{\alpha}}$ is the least squares estimator.
-4. The variance estimator for $T$ is
-   $$
-   \mathbb{V}(T) = \hat{\sigma}^2 \|\tilde{\mathbf{g}}\|^2
-   $$
-5. To show unbiasedness:
-   $$
-   \mathbb{E}[\mathbb{V}(T)] = \mathbb{E}[\hat{\sigma}^2] \|\tilde{\mathbf{g}}\|^2 = \sigma^2 \|\tilde{\mathbf{g}}\|^2 = \operatorname{Var}(T)
-   $$
-   since $\mathbb{E}[\hat{\sigma}^2] = \sigma^2$.
+Since the Jacobian is diagonal in this case (each $\mu_i$ depends only on $b_i$), we get:
+$$
+\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu})) \tau \mathbf{\Psi} \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))
+$$
 
-Therefore, $\mathbb{V}(T)$ is an unbiased estimator of $\operatorname{Var}(T)$ in the classical linear model.
+**Why the SAIGE approximation:**
+However, SAIGE uses a simpler approximation that is computationally more tractable:
+$$
+\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \tau \mathbf{\Psi}
+$$
 
-### c. In the generalized linear mixed model (GLMM)
+This is justified because:
+1. It captures the main correlation structure from the random effects
+2. The diagonal scaling factor $\mu_i(1-\mu_i)$ is absorbed into the overall approximation
+3. It leads to a computationally efficient variance estimator
 
-In the GLMM or logistic mixed model, $\hat{\mathbf{P}}$ is a plug-in estimator using fitted values and estimated variance components. It is generally a consistent estimator, but not exactly unbiased in finite samples due to the use of estimated parameters and the nonlinearity of the model.
+**Final approximation:**
+Therefore, the SAIGE approximation is:
+$$
+\mathbb{V}(\mathbf{y}) \approx \boldsymbol{\Sigma} = \hat{\mathbf{W}}^{-1} + \tau\mathbf{\Psi}
+$$
 
-## 3. Step-by-step proof in the linear model
+**Is the approximation consistent when N is large?**
 
-Suppose $\mathbf{y} \sim \mathcal{N}(\mathbf{X}\boldsymbol{\alpha}, \sigma^2 \mathbf{I})$ and $\tilde{\mathbf{g}}$ is orthogonal to $\mathbf{X}$.
+Yes, under regularity conditions:
+1. $\hat{\boldsymbol{\mu}} \xrightarrow{p} \boldsymbol{\mu}$ as $N \to \infty$
+2. $\hat{\mathbf{W}} \xrightarrow{p} \mathbf{W}$ as $N \to \infty$  
+3. $\hat{\tau} \xrightarrow{p} \tau$ as $N \to \infty$
 
-- $T = \tilde{\mathbf{g}}^\top \mathbf{y}$
-- $\operatorname{Var}(T) = \sigma^2 \|\tilde{\mathbf{g}}\|^2$
-- The unbiased estimator of $\sigma^2$ is $\hat{\sigma}^2 = \frac{\|\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\alpha}}\|^2}{N - p - 1}$
-- Then $\mathbb{V}(T) = \hat{\sigma}^2 \|\tilde{\mathbf{g}}\|^2$ is unbiased for $\operatorname{Var}(T)$
+Therefore: $\hat{\boldsymbol{\Sigma}} \xrightarrow{p} \boldsymbol{\Sigma}$ and the approximation becomes exact in the limit.
 
-## 4. In the mixed model
+### Step 4: Variance of T under projection
 
+**The projection operation:**
 
-#### Step-by-step derivation of consistency in the mixed model
+The projection transforms $\mathbf{g}$ to $\tilde{\mathbf{g}}$ by removing the component that lies in the column space of $\mathbf{X}$:
+$$
+\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g} = (\mathbf{I} - \mathbf{H})\mathbf{g}
+$$
 
-1. In the mixed model, $T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})$ and $\operatorname{Var}(T) = \tilde{\mathbf{g}}^\top \operatorname{Cov}(\mathbf{y}) \tilde{\mathbf{g}}$.
-2. The estimator $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ uses plug-in estimates for the covariance structure, i.e., $\hat{\mathbf{P}}$ is computed from estimated parameters $(\hat{\boldsymbol{\alpha}}, \hat{\tau}, \hat{\mathbf{b}})$ and fitted values $\hat{\boldsymbol{\mu}}$.
-3. As $N \to \infty$, the maximum likelihood (or REML) estimators $\hat{\boldsymbol{\alpha}}, \hat{\tau}, \hat{\mathbf{b}}$ are consistent, i.e., they converge in probability to the true parameter values.
-4. Therefore, $\hat{\boldsymbol{\mu}} \to \boldsymbol{\mu}$ and $\hat{\mathbf{P}} \to \mathbf{P}$ in probability, where $\mathbf{P}$ is the true variance structure for $T$.
-5. By the continuous mapping theorem, $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}} \to \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}} = \operatorname{Var}(T)$ in probability as $N \to \infty$.
-6. Thus, $\mathbb{V}(T)$ is a consistent estimator for $\operatorname{Var}(T)$ in the mixed model.
+where $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}$ is the weighted projection matrix onto the column space of $\mathbf{X}$.
 
-In summary, consistency follows from the consistency of the parameter estimators and the plug-in principle for variance estimation.
+**Variance after projection:**
 
-## 5. Conclusion
+The projected statistic $T = \tilde{\mathbf{g}}^\top \mathbf{y}$ has variance:
+$$
+\mathbb{V}(T) = \mathbb{V}(\tilde{\mathbf{g}}^\top \mathbf{y}) = \tilde{\mathbf{g}}^\top \mathbb{V}(\mathbf{y}) \tilde{\mathbf{g}} = \tilde{\mathbf{g}}^\top \boldsymbol{\Sigma} \tilde{\mathbf{g}}
+$$
 
-- $\mathbb{V}(T)$ is an estimator of $\operatorname{Var}(T)$.
-- It is unbiased in the classical linear model with known variance.
-- In the mixed model, it is generally consistent but not exactly unbiased in finite samples.
+**Why we need to account for the projection:**
+
+However, simply using $\tilde{\mathbf{g}}^\top \boldsymbol{\Sigma} \tilde{\mathbf{g}}$ would be incorrect because:
+
+1. **Constraint violation:** The projection $\tilde{\mathbf{g}}$ is constructed to be orthogonal to $\mathbf{X}$, but this constraint is not reflected in the naive variance calculation.
+
+2. **Degrees of freedom:** The projection reduces the effective degrees of freedom from $N$ to $N-p-1$ (where $p+1$ is the number of columns in $\mathbf{X}$).
+
+3. **Estimation uncertainty:** The variance calculation should account for the fact that we estimated the projection using $\hat{\mathbf{W}}$ rather than the true weights.
+
+**The correct projection-adjusted variance:**
+
+To properly account for the constraint $\tilde{\mathbf{g}} \perp \mathbf{X}$, we need to use the constrained variance formula. This leads to the projection matrix:
+
+$$
+\mathbf{P} = \boldsymbol{\Sigma}^{-1} - \boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}
+$$
+
+**Interpretation of $\mathbf{P}$:**
+
+- $\boldsymbol{\Sigma}^{-1}$ is the precision matrix (inverse of the covariance)
+- The second term $\boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}$ removes the contribution from the column space of $\mathbf{X}$
+- $\mathbf{P}$ is the precision matrix for the constrained problem where we condition on $\tilde{\mathbf{g}} \perp \mathbf{X}$
+
+**Final variance formula:**
+
+The variance of the projected statistic, accounting for the orthogonality constraint, is:
+$$
+\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}}
+$$
+
+This formula correctly accounts for:
+- The covariance structure of $\mathbf{y}$ (through $\boldsymbol{\Sigma}$)
+- The orthogonality constraint $\tilde{\mathbf{g}} \perp \mathbf{X}$
+- The loss of degrees of freedom from the projection
+
+## 2. Consistency of $\hat{\mathbb{V}}(T)$
+
+The estimator is:
+$$
+\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}
+$$
+
+where $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$ and $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$.
+
+### Proof of Consistency
+
+**Step 1: Consistency of parameter estimators**
+
+Under standard regularity conditions for GLMMs:
+- $\hat{\boldsymbol{\alpha}} \xrightarrow{p} \boldsymbol{\alpha}$ 
+- $\hat{\tau} \xrightarrow{p} \tau$
+- $\hat{\mathbf{b}} \xrightarrow{p} \mathbf{b}$ (in appropriate sense)
+
+as $N \to \infty$.
+
+**Step 2: Consistency of fitted values**
+
+From the consistency of parameter estimators:
+$$
+\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}) \xrightarrow{p} \operatorname{logit}^{-1}(\mathbf{X} \boldsymbol{\alpha} + \mathbf{b}) = \boldsymbol{\mu}
+$$
+
+**Step 3: Consistency of weight matrix**
+
+$$
+\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}]) \xrightarrow{p} \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}]) = \mathbf{W}
+$$
+
+**Step 4: Consistency of covariance matrix**
+
+$$
+\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi} \xrightarrow{p} \mathbf{W}^{-1} + \tau\mathbf{\Psi} = \boldsymbol{\Sigma}
+$$
+
+**Step 5: Consistency of projection matrix**
+
+By the continuous mapping theorem:
+$$
+\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1} \xrightarrow{p} \mathbf{P}
+$$
+
+**Step 6: Consistency of variance estimator**
+
+Finally:
+$$
+\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}} \xrightarrow{p} \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}} = \mathbb{V}(T)
+$$
+
+Therefore, $\hat{\mathbb{V}}(T)$ is a consistent estimator of $\mathbb{V}(T)$.
+
+## 3. Summary
+
+- The theoretical variance $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}}$ accounts for both the covariance structure of $\mathbf{y}$ and the orthogonality constraint from the projection.
+- The estimator $\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ is consistent due to the consistency of the underlying parameter estimators and the continuous mapping theorem.
+- This consistency justifies the asymptotic normality of the standardized score statistic $T/\sqrt{\hat{\mathbb{V}}(T)} \xrightarrow{d} \mathcal{N}(0,1)$.

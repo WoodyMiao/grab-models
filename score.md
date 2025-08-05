@@ -254,21 +254,21 @@ Yes, the observations $y_i$ are **marginally correlated** due to the random effe
 
 **Marginal correlation structure:**
 
-**Step-by-step derivation of $\operatorname{Cov}(\mathbf{y})$:**
+**Step-by-step derivation of $\mathbb{V}(\mathbf{y})$:**
 
 To find the marginal covariance of $\mathbf{y}$, we use the law of total covariance:
 $$
-\operatorname{Cov}(\mathbf{y}) = \mathbb{E}[\operatorname{Cov}(\mathbf{y}|\mathbf{b})] + \operatorname{Cov}(\mathbb{E}[\mathbf{y}|\mathbf{b}])
+\mathbb{V}(\mathbf{y}) = \mathbb{E}[\mathbb{V}(\mathbf{y}|\mathbf{b})] + \mathbb{V}(\mathbb{E}[\mathbf{y}|\mathbf{b}])
 $$
 
 **Step 1: Conditional covariance given $\mathbf{b}$**
 Given $\mathbf{b}$, the $y_i$ are independent Bernoulli random variables, so:
 $$
-\operatorname{Cov}(\mathbf{y}|\mathbf{b}) = \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}]) = \mathbf{W}
+\mathbb{V}(\mathbf{y}|\mathbf{b}) = \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}]) = \mathbf{W}
 $$
 where $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b})$.
 
-Therefore: $\mathbb{E}[\operatorname{Cov}(\mathbf{y}|\mathbf{b})] = \mathbb{E}[\mathbf{W}] \approx \mathbf{W}$ (using $\hat{\boldsymbol{\mu}}$).
+Therefore: $\mathbb{E}[\mathbb{V}(\mathbf{y}|\mathbf{b})] = \mathbb{E}[\mathbf{W}] \approx \mathbf{W}$ (using $\hat{\boldsymbol{\mu}}$).
 
 **Step 2: Covariance of conditional expectations**
 The conditional expectation is:
@@ -288,24 +288,24 @@ $$
 
 Therefore:
 $$
-\operatorname{Cov}(\mathbb{E}[\mathbf{y}|\mathbf{b}]) \approx \mathbf{W} \operatorname{Cov}(\mathbf{b}) \mathbf{W} = \mathbf{W} (\tau \mathbf{\Psi}) \mathbf{W} = \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}
+\mathbb{V}(\mathbb{E}[\mathbf{y}|\mathbf{b}]) \approx \mathbf{W} \mathbb{V}(\mathbf{b}) \mathbf{W} = \mathbf{W} (\tau \mathbf{\Psi}) \mathbf{W} = \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}
 $$
 
 **Step 3: Total marginal covariance**
 Combining both terms:
 $$
-\operatorname{Cov}(\mathbf{y}) = \mathbf{W} + \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}
+\mathbb{V}(\mathbf{y}) = \mathbf{W} + \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}
 $$
 
 **Alternative form accounting for fixed effects:**
 When we account for the uncertainty in fixed effects estimation, the effective covariance becomes:
 $$
-\operatorname{Cov}(\mathbf{y}) = \mathbf{W} + \mathbf{W}^{1/2} \mathbf{P}_{\mathbf{X}}^{\perp} \tau \mathbf{\Psi} \mathbf{P}_{\mathbf{X}}^{\perp} \mathbf{W}^{1/2}
+\mathbb{V}(\mathbf{y}) = \mathbf{W} + \mathbf{W}^{1/2} \mathbf{P}_{\mathbf{X}}^{\perp} \tau \mathbf{\Psi} \mathbf{P}_{\mathbf{X}}^{\perp} \mathbf{W}^{1/2}
 $$
 
 where $\mathbf{P}_{\mathbf{X}}^{\perp} = \mathbf{I} - \mathbf{X}(\mathbf{X}^\top\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{W}$ projects onto the orthogonal complement of $\mathbf{X}$.
 
-**Can we use $\mathbb{V}(T) = \mathbf{g}^\top \operatorname{Cov}(\mathbf{y}) \mathbf{g}$?**
+**Can we use $\mathbb{V}(T) = \mathbf{g}^\top \mathbb{V}(\mathbf{y}) \mathbf{g}$?**
 
 **Short answer: No, not directly.**
 
@@ -322,14 +322,14 @@ The issue is that $T = \mathbf{g}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})$, n
 If we had only $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha} + \mathbf{g}\beta)$ with no $\mathbf{b}$, then:
 
 1. **The $y_i$ would be independent** (no correlation from random effects)
-2. **$\operatorname{Cov}(\mathbf{y}) = \mathbf{W}$** (diagonal matrix)
+2. **$\mathbb{V}(\mathbf{y}) = \mathbf{W}$** (diagonal matrix)
 3. **The residuals $(\mathbf{y} - \hat{\boldsymbol{\mu}})$ would have the same covariance structure** as $\mathbf{y}$ asymptotically
 4. **We could use Fisher information** $\mathbb{V}(T) \approx \tilde{\mathbf{g}}^\top \mathbf{W} \tilde{\mathbf{g}}$ for the variance
 
 **For mixed models (with random effects $\mathbf{b}$):**
 
 1. **The $y_i$ are marginally correlated** due to $\mathbf{b}$
-2. **$\operatorname{Cov}(\mathbf{y}) = \mathbf{W} + \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}$** (non-diagonal)
+2. **$\mathbb{V}(\mathbf{y}) = \mathbf{W} + \tau \mathbf{W} \mathbf{\Psi} \mathbf{W}$** (non-diagonal)
 3. **The residuals $(\mathbf{y} - \hat{\boldsymbol{\mu}})$ have different covariance** because $\hat{\mathbf{b}}$ introduces additional correlations
 4. **Fisher information is insufficient** - we need the complex formula $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$
 
