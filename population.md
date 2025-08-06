@@ -23,4 +23,3 @@ When a subject $(y_i, \mathbf{x}_i, g_i, \mathbf{z}_i)$ is sampled from the popu
 
 Let $(\mathbf{y}, \mathbf{X}, \mathbf{g}, \mathbf{Z})$ be a sample of $(y, \mathbf{x}, g, \mathbf{z})$, and let $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{Z}\mathbf{u}$.
 For the $i$th subject, we have $y_i|\eta_i \sim \operatorname{Bernoulli}(\operatorname{logit}^{-1}(\eta_i))$
-

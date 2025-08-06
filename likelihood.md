@@ -89,5 +89,5 @@ $$
 ### Log-likelihood function for $\boldsymbol{\alpha}, \beta, \tau$
 
 $$
-\ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log p_{\mathbf{y}}(\mathbf{y}; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \boldsymbol{\alpha}, \beta, \tau) 
+\ell(\boldsymbol{\alpha}, \beta, \tau; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \mathbf{y}) = \log p_{\mathbf{y}}(\mathbf{y}; \mathbf{X}, \mathbf{g}, \mathbf{\Psi}, \boldsymbol{\alpha}, \beta, \tau)
 $$

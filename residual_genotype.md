@@ -36,7 +36,6 @@ $$
   &= [\mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g}]^{\top} \mathbf{X} \\
   &= \mathbf{g}^{\top}[\mathbf{I} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}]^{\top}\mathbf{X} \\
   &= \mathbf{g}^{\top}[\mathbf{X} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X}] \\
-  &= \mathbf{g}^{\top}[\mathbf{X} - \mathbf{X}] \\
-  &= \mathbf{0}
+  &= \mathbf{g}^{\top}[\mathbf{X} - \mathbf{X}] = \mathbf{0}
 \end{aligned}
 $$

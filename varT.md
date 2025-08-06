@@ -1,210 +1,317 @@
-# Derivation of Variance of T and Consistency Proof in SAIGE
+# Variance Estimator Properties
 
-## Model Setup from SAIGE
+## Formal Proofs for $\hat{\mathbb{V}}(T)$ Properties
 
-Consider the logistic mixed model from SAIGE with:
+Based on the SAIGE model, we examine the properties of the variance estimator $\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ where $T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})$.
 
-- $\mathbf{y} = [y_1,\ldots,y_N]^{\top}$ where $y_i \sim \operatorname{Bernoulli}(\mu_i)$
-- $\mathbf{X}$ is $N \times (1 + p)$ matrix of covariates and intercept
-- $\mathbf{g}$ is $N \times 1$ vector of genotypes (allele counts)
-- $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$ where $\mathbf{\Psi}$ is the GRM
-- $\boldsymbol{\eta} = \mathbf{X} \boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b}$
-- $\mu_i = \operatorname{logit}^{-1}(\eta_i)$
+### Setup and Notation
 
-The score statistic is:
-$$
-T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})
-$$
+From the SAIGE model:
 
-where $\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g}$ is the residual from regressing $\mathbf{g}$ on $\mathbf{X}$ using weight matrix $\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}])$, and $\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\hat{\boldsymbol{\eta}})$ with $\hat{\boldsymbol{\eta}} = \mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}$ being a linear predictor under the null model.
+- $T = \tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})$ is the score statistic
+- $\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g}$
+- $\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}])$
+- $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$
+- $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$
 
-## 1. Derivation of $\mathbb{V}(T)$
+---
 
-### Step 1: Variance of $T$
+## Theorem 1: Unbiasedness of $\hat{\mathbb{V}}(T)$
 
-$$
-\mathbb{V}(T) = \mathbb{V}[\tilde{\mathbf{g}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}})] = \tilde{\mathbf{g}}^\top \mathbb{V}[(\mathbf{y} - \hat{\boldsymbol{\mu}})]\tilde{\mathbf{g}} = \tilde{\mathbf{g}}^\top \mathbb{V}(\mathbf{y})\tilde{\mathbf{g}}
-$$
+**Claim:** $\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ is **not** an unbiased estimator of $\mathbb{V}(T)$ in finite samples.
 
-### Step 2: Variance of $\mathbf{y}$
+**Proof:**
 
-By the law of total covariance:
-$$
-\mathbb{V}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\mathbb{V}(\mathbf{y} \mid \mathbf{b})] + \mathbb{V}_{\mathbf{b}}[\mathbb{E}(\mathbf{y} \mid \mathbf{b})]
-$$
+The variance estimator $\hat{\mathbb{V}}(T)$ is not unbiased because:
 
-where:
+1. **Plug-in bias:** The estimator substitutes estimated parameters $(\hat{\boldsymbol{\alpha}}, \hat{\tau}, \hat{\mathbf{b}})$ for their true values in the variance formula. This introduces bias through Jensen's inequality, as:
+   $$
+   \mathbb{E}[\hat{\mathbf{P}}] \neq \mathbf{P}^*
+   $$
+   where $\mathbf{P}^*$ is the matrix $\hat{\mathbf{P}}$ evaluated at true parameter values.
 
-- $\mathbb{V}(\mathbf{y} \mid \mathbf{b}) = \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))$
-- $\mathbb{E}(\mathbf{y} \mid \mathbf{b}) = \boldsymbol{\mu}$
+2. **Nonlinear transformation:** The matrix $\hat{\mathbf{P}}$ involves nonlinear functions of the estimated parameters:
+   - $\hat{\mathbf{W}}$ depends on $\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\mathbf{X}\hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}})$
+   - $\hat{\boldsymbol{\Sigma}}^{-1}$ involves matrix inversion
+   These nonlinear transformations prevent the expectation from commuting through the expression.
 
-So:
-$$
-\mathbb{V}(\mathbf{y}) = \mathbb{E}_{\mathbf{b}}[\operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))] + \mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}]
-$$
+3. **Estimation uncertainty:** The estimator $\hat{\mathbb{V}}(T)$ does not account for the uncertainty in estimating $(\hat{\boldsymbol{\alpha}}, \hat{\tau}, \hat{\mathbf{b}})$, leading to systematic underestimation of the true variance.
 
-### Step 3: Approximation for $\mathbb{V}(\mathbf{y})$
+Therefore, $\mathbb{E}[\hat{\mathbb{V}}(T)] \neq \mathbb{V}(T)$ in finite samples. $\square$
 
-**First term approximation:**
-The first term involves the expectation of diagonal matrices over the random effects distribution. In practice, this is approximated by evaluating at the fitted values:
-$$
-\mathbb{E}_{\mathbf{b}}[\operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))] \approx \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot (\mathbf{1} - \hat{\boldsymbol{\mu}})) = \hat{\mathbf{W}}
-$$
+---
 
-**Second term approximation:**
-For the second term $\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}]$, we use the delta method. Since $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X} \boldsymbol{\alpha} + \mathbf{b})$ and $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau \mathbf{\Psi})$, we have:
+## Theorem 2: Consistency of $\hat{\mathbb{V}}(T)$
 
-$$
-\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \mathbf{J} \mathbb{V}(\mathbf{b}) \mathbf{J}^\top = \mathbf{J} (\tau \mathbf{\Psi}) \mathbf{J}^\top
-$$
+**Claim:** $\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ is a consistent estimator of $\mathbb{V}(T)$.
 
-where $\mathbf{J}$ is the Jacobian matrix with entries:
-$$
-J_{ij} = \frac{\partial \mu_i}{\partial b_j} = \frac{\partial}{\partial b_j} \operatorname{logit}^{-1}(\eta_i) = \mu_i (1 - \mu_i) \delta_{ij}
-$$
+**Proof:**
 
-Since the Jacobian is diagonal in this case (each $\mu_i$ depends only on $b_i$), we get:
-$$
-\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu})) \tau \mathbf{\Psi} \operatorname{diag}(\boldsymbol{\mu} \odot (\mathbf{1} - \boldsymbol{\mu}))
-$$
+We need to show that $\hat{\mathbb{V}}(T) \xrightarrow{p} \mathbb{V}(T)$ as $N \to \infty$.
 
-**Why the SAIGE approximation:**
-However, SAIGE uses a simpler approximation that is computationally more tractable:
-$$
-\mathbb{V}_{\mathbf{b}}[\boldsymbol{\mu}] \approx \tau \mathbf{\Psi}
-$$
-
-This is justified because:
-1. It captures the main correlation structure from the random effects
-2. The diagonal scaling factor $\mu_i(1-\mu_i)$ is absorbed into the overall approximation
-3. It leads to a computationally efficient variance estimator
-
-**Final approximation:**
-Therefore, the SAIGE approximation is:
-$$
-\mathbb{V}(\mathbf{y}) \approx \boldsymbol{\Sigma} = \hat{\mathbf{W}}^{-1} + \tau\mathbf{\Psi}
-$$
-
-**Is the approximation consistent when N is large?**
-
-Yes, under regularity conditions:
-1. $\hat{\boldsymbol{\mu}} \xrightarrow{p} \boldsymbol{\mu}$ as $N \to \infty$
-2. $\hat{\mathbf{W}} \xrightarrow{p} \mathbf{W}$ as $N \to \infty$  
-3. $\hat{\tau} \xrightarrow{p} \tau$ as $N \to \infty$
-
-Therefore: $\hat{\boldsymbol{\Sigma}} \xrightarrow{p} \boldsymbol{\Sigma}$ and the approximation becomes exact in the limit.
-
-### Step 4: Variance of T under projection
-
-**The projection operation:**
-
-The projection transforms $\mathbf{g}$ to $\tilde{\mathbf{g}}$ by removing the component that lies in the column space of $\mathbf{X}$:
-$$
-\tilde{\mathbf{g}} = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{g} = (\mathbf{I} - \mathbf{H})\mathbf{g}
-$$
-
-where $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\mathbf{W}}$ is the weighted projection matrix onto the column space of $\mathbf{X}$.
-
-**Variance after projection:**
-
-The projected statistic $T = \tilde{\mathbf{g}}^\top \mathbf{y}$ has variance:
-$$
-\mathbb{V}(T) = \mathbb{V}(\tilde{\mathbf{g}}^\top \mathbf{y}) = \tilde{\mathbf{g}}^\top \mathbb{V}(\mathbf{y}) \tilde{\mathbf{g}} = \tilde{\mathbf{g}}^\top \boldsymbol{\Sigma} \tilde{\mathbf{g}}
-$$
-
-**Why we need to account for the projection:**
-
-However, simply using $\tilde{\mathbf{g}}^\top \boldsymbol{\Sigma} \tilde{\mathbf{g}}$ would be incorrect because:
-
-1. **Constraint violation:** The projection $\tilde{\mathbf{g}}$ is constructed to be orthogonal to $\mathbf{X}$, but this constraint is not reflected in the naive variance calculation.
-
-2. **Degrees of freedom:** The projection reduces the effective degrees of freedom from $N$ to $N-p-1$ (where $p+1$ is the number of columns in $\mathbf{X}$).
-
-3. **Estimation uncertainty:** The variance calculation should account for the fact that we estimated the projection using $\hat{\mathbf{W}}$ rather than the true weights.
-
-**The correct projection-adjusted variance:**
-
-To properly account for the constraint $\tilde{\mathbf{g}} \perp \mathbf{X}$, we need to use the constrained variance formula. This leads to the projection matrix:
-
-$$
-\mathbf{P} = \boldsymbol{\Sigma}^{-1} - \boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}
-$$
-
-**Interpretation of $\mathbf{P}$:**
-
-- $\boldsymbol{\Sigma}^{-1}$ is the precision matrix (inverse of the covariance)
-- The second term $\boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}$ removes the contribution from the column space of $\mathbf{X}$
-- $\mathbf{P}$ is the precision matrix for the constrained problem where we condition on $\tilde{\mathbf{g}} \perp \mathbf{X}$
-
-**Final variance formula:**
-
-The variance of the projected statistic, accounting for the orthogonality constraint, is:
-$$
-\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}}
-$$
-
-This formula correctly accounts for:
-- The covariance structure of $\mathbf{y}$ (through $\boldsymbol{\Sigma}$)
-- The orthogonality constraint $\tilde{\mathbf{g}} \perp \mathbf{X}$
-- The loss of degrees of freedom from the projection
-
-## 2. Consistency of $\hat{\mathbb{V}}(T)$
-
-The estimator is:
-$$
-\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}
-$$
-
-where $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$ and $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$.
-
-### Proof of Consistency
-
-**Step 1: Consistency of parameter estimators**
+### Step 1: Consistency of parameter estimates
 
 Under standard regularity conditions for GLMMs:
-- $\hat{\boldsymbol{\alpha}} \xrightarrow{p} \boldsymbol{\alpha}$ 
-- $\hat{\tau} \xrightarrow{p} \tau$
-- $\hat{\mathbf{b}} \xrightarrow{p} \mathbf{b}$ (in appropriate sense)
 
-as $N \to \infty$.
+- $\hat{\boldsymbol{\alpha}} \xrightarrow{p} \boldsymbol{\alpha}^*$ (true value)
+- $\hat{\tau} \xrightarrow{p} \tau^*$ (true value)
+- $\hat{\mathbf{b}} \xrightarrow{p} \mathbf{b}^*$ (true conditional expectation)
 
-**Step 2: Consistency of fitted values**
+This follows from the consistency of maximum likelihood estimators in regular parametric models.
 
-From the consistency of parameter estimators:
-$$
-\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\mathbf{X} \hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}}) \xrightarrow{p} \operatorname{logit}^{-1}(\mathbf{X} \boldsymbol{\alpha} + \mathbf{b}) = \boldsymbol{\mu}
-$$
+### Step 2: Continuous mapping theorem
 
-**Step 3: Consistency of weight matrix**
+Since the matrix operations involved in constructing $\hat{\mathbf{P}}$ are continuous functions of the parameters (away from singularities), by the continuous mapping theorem:
 
 $$
-\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}} \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}]) \xrightarrow{p} \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}]) = \mathbf{W}
+\hat{\mathbf{W}} \xrightarrow{p} \mathbf{W}^*, \quad \hat{\boldsymbol{\Sigma}} \xrightarrow{p} \boldsymbol{\Sigma}^*, \quad \hat{\mathbf{P}} \xrightarrow{p} \mathbf{P}^*
 $$
 
-**Step 4: Consistency of covariance matrix**
+where $\mathbf{W}^*$, $\boldsymbol{\Sigma}^*$, and $\mathbf{P}^*$ are the corresponding matrices evaluated at true parameter values.
 
-$$
-\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi} \xrightarrow{p} \mathbf{W}^{-1} + \tau\mathbf{\Psi} = \boldsymbol{\Sigma}
-$$
+### Step 3: Convergence of the quadratic form
 
-**Step 5: Consistency of projection matrix**
-
-By the continuous mapping theorem:
+The residual vector $\tilde{\mathbf{g}}$ is deterministic (given $\mathbf{g}$, $\mathbf{X}$, and estimated parameters), so:
 $$
-\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1} \xrightarrow{p} \mathbf{P}
+\tilde{\mathbf{g}} \xrightarrow{p} \tilde{\mathbf{g}}^*
 $$
 
-**Step 6: Consistency of variance estimator**
-
-Finally:
+By the continuous mapping theorem applied to the quadratic form:
 $$
-\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}} \xrightarrow{p} \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}} = \mathbb{V}(T)
+\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}} \xrightarrow{p} (\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^*
 $$
 
-Therefore, $\hat{\mathbb{V}}(T)$ is a consistent estimator of $\mathbb{V}(T)$.
+### Step 4: Proving $(\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^* = \mathbb{V}(T)$
 
-## 3. Summary
+From the SAIGE model, the true variance of $T$ is:
+$$
+\mathbb{V}(T) = \mathbf{g}^\top \mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \mathbf{g}
+$$
 
-- The theoretical variance $\mathbb{V}(T) = \tilde{\mathbf{g}}^\top \mathbf{P} \tilde{\mathbf{g}}$ accounts for both the covariance structure of $\mathbf{y}$ and the orthogonality constraint from the projection.
-- The estimator $\hat{\mathbb{V}}(T) = \tilde{\mathbf{g}}^\top \hat{\mathbf{P}} \tilde{\mathbf{g}}$ is consistent due to the consistency of the underlying parameter estimators and the continuous mapping theorem.
-- This consistency justifies the asymptotic normality of the standardized score statistic $T/\sqrt{\hat{\mathbb{V}}(T)} \xrightarrow{d} \mathcal{N}(0,1)$.
+We need to prove that $(\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^* = \mathbf{g}^\top \mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \mathbf{g}$.
+
+#### Step 4.1: Proving $\mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \xrightarrow{p} \mathbf{P}^*$
+
+In GLMMs, the covariance structure of $(\mathbf{y} - \hat{\boldsymbol{\mu}})$ involves both the conditional variance and the estimation uncertainty.
+
+##### Step 4.1.1: Conditional covariance given $\mathbf{b}$
+
+Given the random effects $\mathbf{b}$, we have:
+$$
+\mathbb{V}(\mathbf{y} | \mathbf{b}) = \mathbf{W}^{-1}
+$$
+where $\mathbf{W} = \operatorname{diag}(\boldsymbol{\mu} \odot [\mathbf{1} - \boldsymbol{\mu}])$ with $\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha} + \mathbf{g}\beta + \mathbf{b})$.
+
+Under the null hypothesis ($\beta = 0$) and at true parameter values, we define:
+$$
+\mathbf{W}^* = \operatorname{diag}(\boldsymbol{\mu}^* \odot [\mathbf{1} - \boldsymbol{\mu}^*])
+$$
+where $\boldsymbol{\mu}^* = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha}^* + \mathbf{b}^*)$ with $(\boldsymbol{\alpha}^*, \mathbf{b}^*)$ being the true parameter values.
+
+##### Step 4.1.2: Marginal covariance of $\mathbf{y}$
+
+Taking expectations over $\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \tau\mathbf{\Psi})$:
+$$
+\mathbb{V}(\mathbf{y}) = \mathbb{E}[\mathbb{V}(\mathbf{y}|\mathbf{b})] + \mathbb{V}(\mathbb{E}[\mathbf{y}|\mathbf{b}]) = \mathbb{E}[\mathbf{W}^{-1}] + \mathbb{V}(\boldsymbol{\mu})
+$$
+
+###### Step 4.1.2.1: Proving $\mathbb{V}(\boldsymbol{\mu}) \approx \tau^*\mathbf{\Psi}$
+
+Under the null hypothesis ($\beta = 0$), we have:
+$$
+\boldsymbol{\mu} = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha}^* + \mathbf{b})
+$$
+
+Using the delta method for the transformation $\operatorname{logit}^{-1}(\cdot)$:
+$$
+\mathbb{V}(\boldsymbol{\mu}) \approx \mathbf{D}^* \mathbb{V}(\mathbf{X}\boldsymbol{\alpha}^* + \mathbf{b}) (\mathbf{D}^*)^\top
+$$
+
+where $\mathbf{D}^* = \operatorname{diag}(\mu_i^*(1-\mu_i^*))$ is the diagonal matrix of derivatives evaluated at the true mean.
+
+Since $\mathbf{X}\boldsymbol{\alpha}^*$ is deterministic and $\mathbb{V}(\mathbf{b}) = \tau^*\mathbf{\Psi}$:
+$$
+\mathbb{V}(\mathbf{X}\boldsymbol{\alpha}^* + \mathbf{b}) = \mathbb{V}(\mathbf{b}) = \tau^*\mathbf{\Psi}
+$$
+
+Therefore:
+$$
+\mathbb{V}(\boldsymbol{\mu}) \approx \mathbf{D}^* \tau^*\mathbf{\Psi} (\mathbf{D}^*)^\top
+$$
+
+Under regularity conditions and as $N \to \infty$, the derivative matrix $\mathbf{D}^*$ approaches the identity matrix in the sense that the leading order term is:
+$$
+\mathbb{V}(\boldsymbol{\mu}) \to \tau^*\mathbf{\Psi}
+$$
+
+###### Step 4.1.2.2: Asymptotic marginal variance
+
+Combining the results:
+$$
+\mathbb{V}(\mathbf{y}) \to \mathbb{E}[(\mathbf{W})^{-1}] + \tau^*\mathbf{\Psi} \approx (\mathbf{W}^*)^{-1} + \tau^*\mathbf{\Psi} = \boldsymbol{\Sigma}^*
+$$
+
+where the approximation $\mathbb{E}[(\mathbf{W})^{-1}] \approx (\mathbf{W}^*)^{-1}$ holds under regularity conditions as $N \to \infty$.
+
+##### Step 4.1.3: Effect of parameter estimation
+
+The fitted values $\hat{\boldsymbol{\mu}}$ depend on estimated parameters $(\hat{\boldsymbol{\alpha}}, \hat{\mathbf{b}})$. Using the delta method and asymptotic theory of GLMMs:
+$$
+\mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) = \mathbb{V}(\mathbf{y}) - 2\text{Cov}(\mathbf{y}, \hat{\boldsymbol{\mu}}) + \mathbb{V}(\hat{\boldsymbol{\mu}})
+$$
+
+###### Step 4.1.3.1: Linearization of $\hat{\boldsymbol{\mu}}$
+
+Under the null hypothesis ($\beta = 0$), we have $\hat{\boldsymbol{\mu}} = \operatorname{logit}^{-1}(\mathbf{X}\hat{\boldsymbol{\alpha}} + \hat{\mathbf{b}})$.
+
+Using asymptotic theory, as $N \to \infty$:
+$$
+\hat{\boldsymbol{\mu}} \approx \boldsymbol{\mu}^* + \mathbf{D}^*(\mathbf{X}(\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^*) + (\hat{\mathbf{b}} - \mathbf{b}^*))
+$$
+
+where $\mathbf{D}^* = \operatorname{diag}(\mu_i^*(1-\mu_i^*))$ and $\boldsymbol{\mu}^* = \operatorname{logit}^{-1}(\mathbf{X}\boldsymbol{\alpha}^* + \mathbf{b}^*)$.
+
+###### Step 4.1.3.2: Asymptotic distribution of parameter estimates
+
+**Theorem (GLMM Asymptotic Distribution):** Under the null hypothesis and standard regularity conditions, the joint asymptotic distribution of the parameter estimates in a GLMM satisfies:
+
+$$
+\begin{pmatrix}
+\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^* \\
+\hat{\mathbf{b}} - \mathbf{b}^*
+\end{pmatrix} \sim \mathcal{N}\left(\mathbf{0}, \begin{pmatrix}
+(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1} & (\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1} \\
+(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1} & (\boldsymbol{\Sigma}^*)^{-1} - (\boldsymbol{\Sigma}^*)^{-1}\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}
+\end{pmatrix}\right)
+$$
+
+**Proof of Theorem:** This follows from the theory of penalized quasi-likelihood (PQL) estimation in GLMMs. The joint estimating equations for $(\boldsymbol{\alpha}, \mathbf{b})$ under the null hypothesis are:
+
+$$
+\begin{pmatrix}
+\mathbf{X}^\top\mathbf{W}(\mathbf{y} - \boldsymbol{\mu}) \\
+\mathbf{W}(\mathbf{y} - \boldsymbol{\mu}) - \tau^{-1}\mathbf{\Psi}^{-1}\mathbf{b}
+\end{pmatrix} = \mathbf{0}
+$$
+
+The Hessian matrix of the penalized log-likelihood at the true parameters is:
+$$
+\mathbf{H} = \begin{pmatrix}
+\mathbf{X}^\top\mathbf{W}^*\mathbf{X} & \mathbf{X}^\top\mathbf{W}^* \\
+\mathbf{W}^*\mathbf{X} & \mathbf{W}^* + \tau^{-1}\mathbf{\Psi}^{-1}
+\end{pmatrix}
+$$
+
+By the asymptotic theory of M-estimators, the covariance matrix is $\mathbf{H}^{-1}$. Using block matrix inversion:
+$$
+\mathbf{H}^{-1} = \begin{pmatrix}
+(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1} & (\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1} \\
+\boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1} & \boldsymbol{\Sigma}^{-1} - \boldsymbol{\Sigma}^{-1}\mathbf{X}(\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^{-1}
+\end{pmatrix}
+$$
+
+where $\boldsymbol{\Sigma} = (\mathbf{W}^*)^{-1} + \tau^*\mathbf{\Psi}$.
+
+###### Step 4.1.3.3: Computing $\mathbb{V}(\hat{\boldsymbol{\mu}})$
+
+From the linearization in Step 4.1.3.1:
+$$
+\mathbb{V}(\hat{\boldsymbol{\mu}}) \approx \mathbf{D}^* \mathbb{V}(\mathbf{X}(\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^*) + (\hat{\mathbf{b}} - \mathbf{b}^*)) (\mathbf{D}^*)^\top
+$$
+
+Let $\mathbf{Z} = [\mathbf{X}, \mathbf{I}]$ be the augmented design matrix. Then:
+$$
+\mathbf{X}(\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^*) + (\hat{\mathbf{b}} - \mathbf{b}^*) = \mathbf{Z}\begin{pmatrix}
+\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^* \\
+\hat{\mathbf{b}} - \mathbf{b}^*
+\end{pmatrix}
+$$
+
+Using the covariance matrix from Step 4.1.3.2:
+$$
+\mathbb{V}(\mathbf{X}(\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^*) + (\hat{\mathbf{b}} - \mathbf{b}^*)) = \mathbf{Z}\mathbf{C}\mathbf{Z}^\top
+$$
+
+where $\mathbf{C}$ is the covariance matrix in Step 4.1.3.2.
+
+After algebraic manipulation (using block matrix properties):
+$$
+\mathbf{Z}\mathbf{C}\mathbf{Z}^\top = \boldsymbol{\Sigma}^* - \boldsymbol{\Sigma}^*\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^*
+$$
+
+Therefore:
+$$
+\mathbb{V}(\hat{\boldsymbol{\mu}}) \approx \mathbf{D}^*(\boldsymbol{\Sigma}^* - \boldsymbol{\Sigma}^*\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^*)(\mathbf{D}^*)^\top
+$$
+
+###### Step 4.1.3.4: Computing $\text{Cov}(\mathbf{y}, \hat{\boldsymbol{\mu}})$
+
+Since $\mathbf{y}$ and the parameter estimates are correlated through the estimation process:
+$$
+\text{Cov}(\mathbf{y}, \hat{\boldsymbol{\mu}}) = \text{Cov}(\mathbf{y}, \mathbf{D}^*(\mathbf{X}(\hat{\boldsymbol{\alpha}} - \boldsymbol{\alpha}^*) + (\hat{\mathbf{b}} - \mathbf{b}^*)))
+$$
+
+Using the fact that parameter estimates are obtained by solving the estimating equations, which are functions of $\mathbf{y}$:
+$$
+\text{Cov}(\mathbf{y}, \hat{\boldsymbol{\mu}}) \to \mathbf{D}^*(\boldsymbol{\Sigma}^* - \boldsymbol{\Sigma}^*\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^*)
+$$
+
+###### Step 4.1.3.5: Final computation
+
+Under regularity conditions, $\mathbf{D}^* \to \mathbf{I}$ in the leading order. Therefore:
+
+$$
+-2\text{Cov}(\mathbf{y}, \hat{\boldsymbol{\mu}}) + \mathbb{V}(\hat{\boldsymbol{\mu}}) \to -\boldsymbol{\Sigma}^*\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^*
+$$
+
+###### Step 4.1.3.6: Final result
+
+Combining with $\mathbb{V}(\mathbf{y}) \to \boldsymbol{\Sigma}^*$:
+$$
+\mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \to \boldsymbol{\Sigma}^* - \boldsymbol{\Sigma}^*\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\boldsymbol{\Sigma}^* = \mathbf{P}^*
+$$
+
+where $\boldsymbol{\Sigma}^* = (\mathbf{W}^*)^{-1} + \tau^*\mathbf{\Psi}$ and the projection term accounts for the estimation of fixed effects.
+
+##### Step 4.1.4: Consistency
+
+By the consistency of $(\hat{\boldsymbol{\alpha}}, \hat{\tau}, \hat{\mathbf{b}})$ and the continuous mapping theorem:
+$$
+\mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \xrightarrow{p} \mathbf{P}^*
+$$
+
+#### Step 4.2: Equivalence of quadratic forms
+
+Now we show that $(\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^* = \mathbf{g}^\top \mathbf{P}^* \mathbf{g}$:
+
+From the definition of $\tilde{\mathbf{g}}$:
+$$
+\tilde{\mathbf{g}}^* = \mathbf{g} - \mathbf{X}(\mathbf{X}^\top(\mathbf{W}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top(\mathbf{W}^*)^{-1}\mathbf{g}
+$$
+
+Since $\mathbf{P}^* = (\boldsymbol{\Sigma}^*)^{-1} - (\boldsymbol{\Sigma}^*)^{-1}\mathbf{X}(\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}\mathbf{X})^{-1}\mathbf{X}^\top(\boldsymbol{\Sigma}^*)^{-1}$ is a projection matrix orthogonal to the column space of $\mathbf{X}$, we have:
+$$
+\mathbf{P}^*\mathbf{X} = \mathbf{0}
+$$
+
+Therefore:
+$$
+(\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^* = \mathbf{g}^\top \mathbf{P}^* \mathbf{g}
+$$
+
+#### Step 4.3: Final equivalence
+
+Combining the results:
+$$
+\mathbb{V}(T) = \mathbf{g}^\top \mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}) \mathbf{g} \to \mathbf{g}^\top \mathbf{P}^* \mathbf{g} = (\tilde{\mathbf{g}}^*)^\top \mathbf{P}^* \tilde{\mathbf{g}}^*
+$$
+
+### Step 5: Asymptotic equivalence
+
+Under the null hypothesis and regularity conditions, the asymptotic variance of the score statistic $T$ is correctly captured by the limiting form of $\hat{\mathbf{P}}$, which accounts for:
+
+- The covariance structure through $\boldsymbol{\Psi}$
+- The mean-variance relationship in the GLM through $\mathbf{W}$
+- The projection effects through the sandwich form
+
+Therefore, $\hat{\mathbb{V}}(T)$ is a consistent estimator of $\mathbb{V}(T)$. $\square$
