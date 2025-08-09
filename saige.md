@@ -82,6 +82,7 @@ $$
 $$
 
 Substituting into the log-likelihood function yields
+
 $$
 \begin{aligned}
 \ell(\boldsymbol{\alpha, \beta}; \mathbf{y}|\mathbf{b}, \mathbf{X}, \mathbf{G})
@@ -171,12 +172,14 @@ be an estimate of $(\tau_0, \boldsymbol{\alpha}_0, \mathbf{b}_0)$ under the null
 
 ## 5. Score statistic
 
+### 5.1 Score statistic and its variance
 Let the score statistic for $\beta$ be
+
 $$
 T = U_\beta(\beta=0, \hat{\boldsymbol{\alpha}}_0, \mathbf{y}, \hat{\mathbf{b}}_0, \mathbf{X}, \mathbf{G}) = \mathbf{G}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) \tag{10}
 $$
 
-where $\hat{\boldsymbol{\mu}}_0 = \operatorname{logit}^{-1}(\mathbf{X}\hat{\boldsymbol{\alpha}}_0 + \hat{\mathbf{b}}_0)$. Since $\hat{\boldsymbol{\alpha}}_0$ and $\hat{\mathbf{b}}_0$ defined in (8) and (9) are functions of sample $\mathbf{y}$, they are random vectors and are determined after $\mathbf{y}$ is observed. As $N$ becomes large, $\hat{\boldsymbol{\alpha}}_0$ converges to $\boldsymbol{\alpha}_0$, while $\hat{\mathbf{b}}_0 = \mathbb{E}[\mathbf{b}_0 \mid \mathbf{y}, \hat{\boldsymbol{\alpha}}_0, \hat{\tau}_0]$ continues to vary across different samples. When $N$ is large, there is $\hat{\boldsymbol{\alpha}}_0 \approx \boldsymbol{\alpha}_0$; conditioning on $\mathbf{b}_0$, there is $\hat{\mathbf{b}}_0 = \mathbf{b}_0$ and $\hat{\boldsymbol{\mu}}_0 \approx \boldsymbol{\mu}_0$, and thus we have
+where $\hat{\boldsymbol{\mu}}_0 = \operatorname{logit}^{-1}(\mathbf{X}\hat{\boldsymbol{\alpha}}_0 + \hat{\mathbf{b}}_0)$. Since $\hat{\boldsymbol{\alpha}}_0$ and $\hat{\mathbf{b}}_0$ defined in (8) and (9) are functions of sample $\mathbf{y}$, they are random vectors and are determined after $\mathbf{y}$ is observed. As $N$ becomes large, $\hat{\boldsymbol{\alpha}}_0$ converges to $\boldsymbol{\alpha}_0$, while $\hat{\mathbf{b}}_0 = \mathbb{E}[\mathbf{b}_0 \mid \mathbf{y}, \hat{\boldsymbol{\alpha}}_0, \hat{\tau}_0]$ continues to vary across different samples. When $N$ is large, there is $\hat{\boldsymbol{\alpha}}_0 \approx \boldsymbol{\alpha}_0$; conditioning on $\mathbf{b}_0$ (treating as known and fixed), we replace $\hat{\mathbf{b}}_0$ with $\mathbf{b}_0$. Therefore,
 
 - $\mathbb{V}(\hat{\boldsymbol{\mu}}_0|\mathbf{b}_0) \approx \mathbb{V}(\boldsymbol{\mu}_0|\mathbf{b}_0)=0$
 - $\mathbb{E}(\hat{\boldsymbol{\mu}}_0|\mathbf{b}_0) \approx \mathbb{E}(\boldsymbol{\mu}_0|\mathbf{b}_0)=\boldsymbol{\mu}_0$
@@ -204,18 +207,16 @@ $$
 Since $W_{ii}$ is a convex function of $b_{i0}$, by Jensen's inequality, we have
 
 $$
-\mathbb{E}_{b_{i0}}(W_{ii}) \geq \frac{e^{-(\mathbf{X}_i\boldsymbol{\alpha}_0 + \mathbb{E}b_{i0})}}{(1 + e^{-(\mathbf{X}_i\boldsymbol{\alpha}_0 + \mathbb{E}b_{i0})})^2}
+\mathbb{E}_{b_{i0}}(W_{ii}) \geq W_{ii}
 $$
 
-Let
+Then, according to (10), we have
 
-- $\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}}_0 \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}_0])$
-- $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$
-- $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$
-- $\operatorname{Var}(T) = \mathbf{G}^\top \hat{\mathbf{P}} \mathbf{G}$
-- $\operatorname{Var}(T)^* = \mathbf{G}^\top \hat{\mathbf{W}} \mathbf{G}$
+$$
+\mathbb{V}(T) = \mathbf{G}^\top \mathbb{V}(\mathbf{y} - \hat{\boldsymbol{\mu}}_0) \mathbf{G} \approx \mathbf{G}^\top \mathbb{E}_\mathbf{b_0}(\mathbf{W}) \mathbf{G} \tag{11}
+$$
 
-where $\operatorname{Var}(T)$ is a consistent estimator for $\mathbb{V}(T)$, and $\operatorname{Var}(T)^*$ is a consistent estimator for $\mathbb{V}(T|\mathbf{b}_0)$ (proof needed).
+### 5.2 Covariate-adjusted genotype vector
 
 Let
 
@@ -236,20 +237,22 @@ $$
 According to (7), $\mathbf{X}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) = U_{\boldsymbol{\alpha}}(\hat{\boldsymbol{\alpha}}_0, \beta=0, \mathbf{y}, \hat{\mathbf{b}}_0, \mathbf{X}, \mathbf{G})$ is the conditional score function for $\boldsymbol{\alpha}$ evaluated at its MLE under the null model. By definition of the MLE, this score function equals the zero vector since the MLE solves the score equations. Thus, we have
 
 $$
-T = \mathbf{G}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) = \tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) \tag{11}
+T = \mathbf{G}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) = \tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0) \tag{12}
 $$
 
-And there is
+### 5.3 Variance-adjusted score statistic
 
-$$
-\operatorname{Var}(T) = \mathbf{G}^\top \hat{\mathbf{P}} \mathbf{G} = \tilde{\mathbf{G}}^\top \hat{\mathbf{P}} \tilde{\mathbf{G}}
-$$
+Let
 
-$$
-\operatorname{Var}(T)^* = \mathbf{G}^\top \hat{\mathbf{W}} \mathbf{G} = \tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}}
-$$
+- $\hat{\mathbf{W}} = \operatorname{diag}(\hat{\boldsymbol{\mu}}_0 \odot [\mathbf{1} - \hat{\boldsymbol{\mu}}_0])$
+- $\hat{\boldsymbol{\Sigma}} = \hat{\mathbf{W}}^{-1} + \hat{\tau}\mathbf{\Psi}$
+- $\hat{\mathbf{P}} = \hat{\boldsymbol{\Sigma}}^{-1} - \hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X}(\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}\mathbf{X})^{-1}\mathbf{X}^\top\hat{\boldsymbol{\Sigma}}^{-1}$
+- $\operatorname{Var}(T) = \tilde{\mathbf{G}}^\top \hat{\mathbf{P}} \tilde{\mathbf{G}}$
+- $\operatorname{Var}(T)^* = \tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}}$
 
-According to Zhou et al., 2018, the ratio between the two variance estimators
+where $\operatorname{Var}(T)$ is an estimator for $\mathbb{V}(T)$, and $\operatorname{Var}(T)^*$ is an estimator for $\mathbb{V}(T|\mathbf{b}_0)$.
+
+According to Zhou et al. (2018), the ratio between the two variance estimators
 
 $$ r = \frac{\operatorname{Var}(T)}{\operatorname{Var}(T)^*} = \frac{\tilde{\mathbf{G}}^\top \hat{\mathbf{P}} \tilde{\mathbf{G}}}{\tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}}}
 $$
@@ -259,18 +262,14 @@ remains nearly constant across all tested variants.
 Let the variance-adjusted test statistic be
 
 $$
-T_\mathrm{adj}=\frac{T}{\sqrt{\operatorname{Var}(T)}} = \frac{\tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0)}{\sqrt{\tilde{\mathbf{G}}^\top \hat{\mathbf{P}} \tilde{\mathbf{G}}}}
+T_\mathrm{adj}=\frac{T}{\sqrt{\operatorname{Var}(T)}} = \frac{\tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0)}{\sqrt{\tilde{\mathbf{G}}^\top \hat{\mathbf{P}} \tilde{\mathbf{G}}}} = \frac{\tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0)}{\sqrt{r\tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}}}} \tag{13}
 $$
 
-$$
-T_\mathrm{adj}^*=\frac{T}{\sqrt{\operatorname{Var}(T)^*}} = \frac{\tilde{\mathbf{G}}^\top (\mathbf{y} - \hat{\boldsymbol{\mu}}_0)}{\sqrt{\tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}}}}
-$$
+## 6. SPA for CDF of $T_\mathrm{adj}$
 
-## 6. SPA for CDF
+### 6.1 Conditional CGF of $\sqrt{r}T_\mathrm{adj}$ given $\mathbf{b}_0$ fixed at $\hat{\mathbf{b}}_0$
 
-### 6.1 Conditional CGF of $T_\mathrm{adj}^*$ given $\mathbf{b}_0$
-
-For $y_i|b_{i0} \sim \text{Bernoulli}(\hat{\mu}_{i0})$, the MGF is
+For $y_i \mid b_{i0}=\hat{b}_{i0} \sim \text{Bernoulli}(\hat{\mu}_{i0})$, the MGF is
 
 $$
 M_{y_i}(t) = \mathbb{E}[e^{ty_i}] = (1 - \hat{\mu}_{i0}) + \hat{\mu}_{i0} e^t = 1 - \hat{\mu}_{i0} + \hat{\mu}_{i0} e^t
@@ -283,27 +282,29 @@ K_{y_i}(t) = \log M_{y_i}(t) = \log(1 - \hat{\mu}_{i0} + \hat{\mu}_{i0} e^t)
 $$
 
 For the centered variable $(y_i - \hat{\mu}_{i0})$, the CGF is
+
 $$
 K_{y_i - \hat{\mu}_{i0}}(t) = K_{y_i}(t) - t\hat{\mu}_{i0} = \log(1 - \hat{\mu}_{i0} + \hat{\mu}_{i0} e^t) - t\hat{\mu}_{i0}
 $$
 
-Given $\mathbf{b}_0$, we consider
+Given $\mathbf{b}_0 = \hat{\mathbf{b}}_0$, we consider
 
 $$
-T_\mathrm{adj}^* = \sum_{i=1}^N w_i (y_i - \hat{\mu}_{i0}),\quad w_i = c\tilde{G}_i, \quad c = \frac{1}{\sqrt{\operatorname{Var}(T)^*}}
+\sqrt{r}T_\mathrm{adj} = \sum_{i=1}^N w_i (y_i - \hat{\mu}_{i0}),\quad w_i = c\tilde{G}_i, \quad c = \frac{1}{\sqrt{\operatorname{Var}(T)^*}}
 $$
 
 as weighted sum of independent Bernoulli variables. Its CGF is
+
 $$
 \begin{aligned}
 K(t)
 &= \sum_{i=1}^N K_{y_i - \hat{\mu}_{i0}}(w_i t) \\
 &= \sum_{i=1}^N \left[\log(1 - \hat{\mu}_{i0} + \hat{\mu}_{i0} e^{w_i t}) - w_i t \hat{\mu}_{i0}\right] \\
 &= \sum_{i=1}^N \log(1 - \hat{\mu}_i + \hat{\mu}_i e^{ct\tilde{G}_i}) - ct \sum_{i=1}^N \tilde{G}_i \hat{\mu}_i
-\end{aligned}
+\end{aligned} \tag{14}
 $$
 
-### 6.2 Derivatives of the conditional CGF of $T_\mathrm{adj}^*$ given $\mathbf{b}_0$
+### 6.2 Derivatives of the conditional CGF
 
 The first derivative of $K(t)$ is
 
@@ -312,33 +313,37 @@ $$
 K'(t)
 &= c \sum_{i=1}^N \left[\frac{\tilde{G}_i \hat{\mu}_i e^{ct\tilde{G}_i}}{1 - \hat{\mu}_i + \hat{\mu}_i e^{ct\tilde{G}_i}} - \tilde{G}_i \hat{\mu}_i\right] \\
 &= c \sum_{i=1}^N \tilde{G}_i \hat{\mu}_i \left[\frac{e^{ct\tilde{G}_i} - 1}{1 - \hat{\mu}_i + \hat{\mu}_i e^{ct\tilde{G}_i}}\right]
-\end{aligned}
+\end{aligned} \tag{15}
 $$
 
 The second derivative of $K(t)$ is
 
 $$
-K''(t) = c^2 \sum_{i=1}^N \frac{\tilde{G}_i^2 \hat{\mu}_i (1 - \hat{\mu}_i) e^{ct\tilde{G}_i}}{(1 - \hat{\mu}_i + \hat{\mu}_i e^{ct\tilde{G}_i})^2}
+K''(t) = c^2 \sum_{i=1}^N \frac{\tilde{G}_i^2 \hat{\mu}_i (1 - \hat{\mu}_i) e^{ct\tilde{G}_i}}{(1 - \hat{\mu}_i + \hat{\mu}_i e^{ct\tilde{G}_i})^2} \tag{16}
 $$
 
-The first cumulant (mean) of $T_\mathrm{adj}^*$ is
+The first cumulant (mean) of $\sqrt{r}T_\mathrm{adj} \mid \mathbf{b}_0 = \hat{\mathbf{b}}_0$ is
 
 $$
 \kappa_1 = K'(0) = c \sum_{i=1}^N \tilde{G}_i \hat{\mu}_i \left[\frac{e^0 - 1}{1 - \hat{\mu}_i + \hat{\mu}_i e^0}\right] = 0
 $$
 
-The second cumulant (variance) of $T_\mathrm{adj}^*$ is
+The second cumulant (variance) of $\sqrt{r}T_\mathrm{adj} \mid \mathbf{b}_0 = \hat{\mathbf{b}}_0$ is
 
 $$
 \kappa_2 = K''(0) = c^2 \sum_{i=1}^N \tilde{G}_i^2 \hat{\mu}_i (1 - \hat{\mu}_i) =  c^2\tilde{\mathbf{G}}^\top \hat{\mathbf{W}} \tilde{\mathbf{G}} = 1
 $$
 
-### 6.3 SPA for CDF of $T_\mathrm{adj}$
+Therefore, $\mathbb{V}(\sqrt{r}T_\mathrm{adj} \mid \mathbf{b}_0 = \hat{\mathbf{b}}_0) = 1$.
 
-According to Lugannani and Rice (1980), the SPA for CDF of $T_\mathrm{adj}$ is
+### 6.3 Approximated SPA for CDF of $T_\mathrm{adj}$ by SAIGE
+
+According to Zhou et al. (2018), the CDF of $T_\mathrm{adj}$ is well-approximated by the CDF of $\sqrt{r}T_\mathrm{adj}$ conditional on $\mathbf{b}_0 = \hat{\mathbf{b}}_0$.
+
+According to Lugannani and Rice (1980), and equations (14)-(16), the SPA for CDF of $T_\mathrm{adj}$ is
 
 $$
-P(T_\mathrm{adj} < q) \approx \Phi\left\{w + \frac{1}{w} \log\left(\frac{v}{w}\right)\right\}
+P(T_\mathrm{adj} < q) \approx \Phi\left\{w + \frac{1}{w} \log\left(\frac{v}{w}\right)\right\} \tag{17}
 $$
 
 where:
@@ -346,5 +351,3 @@ where:
 - $\hat{\zeta}$ is the solution of $K'(\hat{\zeta}) = q$
 - $w = \operatorname{sgn}(\hat{\zeta})\sqrt{2[\hat{\zeta}q - K(\hat{\zeta})]}$
 - $v = \hat{\zeta}\sqrt{K''(\hat{\zeta})}$
-
-The relationship between the marginal distribution of $T_\mathrm{adj}$ and the conditional distribution of $T_\mathrm{adj}^*$ given $\mathbf{b}_0$ needs to be explored.
