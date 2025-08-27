@@ -173,21 +173,26 @@ The empirical genetic relationship between individuals $i$ and $j$ can be decomp
 
 ## Estimator for individual-specific allele frequency
 
-Assume that the top $D$ PCs from the PC-AiR method discussed in the previous subsection reflect the population structure in this sample, and let $\mathbf{V} = [\mathbf{V}^1, \ldots, \mathbf{V}^D]$ be an $|N| \times D$ matrix whose column vectors correspond to the top $D$ PCs. Let $\mathbf{g}_s$ be a length $|N|$ vector of genotype values for all sampled individuals at SNP $s$, and consider the linear regression model
+Assume that the top $D$ PCs reflect the population structure in this sample, and let $\mathbf{V} = [\mathbf{V}^1, \ldots, \mathbf{V}^D]$ be an $|N| \times D$ matrix whose column vectors correspond to the top $D$ PCs. Let $\mathbf{g}_s$ be a length $|N|$ vector of genotype values for all sampled individuals at SNP $s$, and consider the linear regression model
 
 $$
 \mathbb{E}[\mathbf{g}_s \mid \mathbf{V}] = \mathbf{1}\beta_0 + \mathbf{V}\boldsymbol{\beta},
 $$
 
-where $\mathbf{1}$ is a length $|N|$ vector of 1s, and $\boldsymbol{\beta} = (\beta_1, \ldots, \beta_D)^\top$ is a length $D$ vector of regression coefficients for each of the PCs.
 
-The expectation of $\mathbf{g}_s$ conditional on $\mathbf{V}$ is equivalent to the expectation of $\mathbf{g}_s$ conditional on the true ancestries of the sampled individuals. Therefore, the fitted values from this linear regression model can be used to predict individual-specific allele frequencies from the PCs, and our proposed estimator for $\mu_{is}$ at each SNP $s \in S$ is
+Assume the expectation of $\mathbf{g}_s$ conditional on $\mathbf{V}$ is equivalent to the expectation of $\mathbf{g}_s$ conditional on the true ancestries of the sampled individuals, i.e., 
+
+$$
+\mathbb{E}[\mathbf{g}_s \mid \mathbf{V}] = \mathbb{E}[\mathbf{g}_s \mid \mathbf{A}^\top\mathbf{p}_s] = 2\boldsymbol{\mu}_s
+$$ 
+
+Therefore, the fitted values from this linear regression model can be used to predict individual-specific allele frequencies from the PCs, and our proposed estimator for $\mu_{is}$ at each SNP $s \in S$ is
 
 $$
 \hat{\mu}_{is} = \frac{1}{2} \widehat{\mathbb{E}}\left[ g_{is} \mid V_i^1, \ldots, V_i^D \right] = \frac{1}{2} \left( \hat{\beta}_0 + \sum_{d=1}^D \hat{\beta}_d V_i^d \right)
 $$
 
-where $V_i^d$ is the coordinate for individual $i$ along the $d^\text{th}$ PC, $\mathbf{V}_d$, with $d \in \{1, \ldots, D\}$. Because each PC has mean $0$, $(1/2)\hat{\beta}_0$ is equal to the sample average allele frequency at SNP $s$, which can be interpreted as an estimate of $p_s$, the population allele frequency, and each of the parameter estimates $\hat{\beta}_d$ can be viewed as a measure of deviation in allele frequency from the sample average due to the ancestry component represented by $\mathbf{V}_d$.
+where $V_i^d$ is the coordinate for individual $i$ along the $d^\text{th}$ PC, $\mathbf{V}_d$, with $d \in \{1, \ldots, D\}$. Because each PC has mean $0$, $(1/2)\hat{\beta}_0$ is equal to the sample average allele frequency at SNP $s$, which can be interpreted as an estimate of $p_s$, the population allele frequency, and each $\hat{\beta}_d$ can be viewed as a measure of deviation in allele frequency from the sample average due to the ancestry component represented by $\mathbf{V}_d$.
 
 ## PC-Relate estimator for $\phi_{ij}$ and its asymptotic properties
 
